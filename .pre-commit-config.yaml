@@ -28,7 +28,7 @@ repos:
       - id: zabbix-file
         name: zabbix file
         description: Check that the Zabbix import file are up to date
-        entry: regenerate.js
-        language: script
+        entry: make regenerate
+        language: system
         pass_filenames: false
         always_run: true
