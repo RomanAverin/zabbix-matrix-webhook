@@ -81,7 +81,7 @@ var Matrix = {
     }
   },
 
-  request: function (path, payload) {
+  request: function (method, path, payload) {
     var request = new HttpRequest()
     request.addHeader("Content-Type: application/json")
     request.addHeader("Authorization: Bearer " + Matrix.matrix_token)
@@ -94,7 +94,12 @@ var Matrix = {
       request.setProxy(Matrix.http_proxy)
     }
 
-    var blob = request.post(url, JSON.stringify(payload))
+    var blob
+    if (method === "PUT") {
+      blob = request.put(url, JSON.stringify(payload))
+    } else {
+      blob = request.post(url, JSON.stringify(payload))
+    }
 
     if (request.getStatus() !== 200) {
       var resp = JSON.parse(blob)
@@ -109,7 +114,7 @@ var Matrix = {
   },
 
   joinRoom: function () {
-    Matrix.request("/_matrix/client/r0/rooms/" + Matrix.matrix_room + "/join", {})
+    Matrix.request("POST", "/_matrix/client/v3/rooms/" + encodeURIComponent(Matrix.matrix_room) + "/join", {})
   },
 
   sendMessage: function () {
@@ -158,8 +163,11 @@ var Matrix = {
       formatted_body: formatted_body,
     }
 
+    var txnId = new Date().getTime()
+
     Matrix.request(
-      "/_matrix/client/r0/rooms/" + Matrix.matrix_room + "/send/m.room.message",
+      "PUT",
+      "/_matrix/client/v3/rooms/" + encodeURIComponent(Matrix.matrix_room) + "/send/m.room.message/" + txnId,
       payload
     )
   },
